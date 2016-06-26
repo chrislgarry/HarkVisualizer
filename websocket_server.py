@@ -10,17 +10,16 @@ from werkzeug.utils import secure_filename
 from datetime import timedelta
 from random import randint
 
-# Constants
 UPLOAD_FOLDER = '/tmp/'
 ALLOWED_EXTENSIONS = set(['flac', 'wav', 'ogg'])
 STATIC_PATH = "static"
 TEMPLATE_PATH = "templates"
+listen_port=80
 
 settings = {
     "static_path": os.path.join(os.path.dirname(__file__), STATIC_PATH),
     "template_path": os.path.join(os.path.dirname(__file__), TEMPLATE_PATH),
 }
-
 
 paymentTypes = ["cash", "tab", "visa","mastercard","bitcoin"]
 namesArray = ['Ben', 'Jarrod', 'Vijay', 'Aziz']
@@ -42,10 +41,8 @@ class Index(web.RequestHandler):
     def get(self):
         self.render("index.html")
     def post(self):
-        # Check if the post request has the file part, else do nothing
         if 'file' not in self.request.files:
             self.render("index.html")
-        # Get the file field object
         file = self.request.files['file'][0]
         if file and allowed_file(file['filename']):
             filename = secure_filename(file['filename'])
@@ -54,8 +51,6 @@ class Index(web.RequestHandler):
             readhandle = open(UPLOAD_FOLDER + filename, 'rb')
             harkclient.uploadFile(readhandle)
         self.render("visualize.html")
-
-
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -97,7 +92,6 @@ class WebSocketHandler(websocket.WebSocketHandler):
   def send_data(self):
     print "Sending Data"
 
-
     #create a bunch of random data for various dimensions we want
     #instead, pull data from hark here
     qty = random.randrange(1,4)
@@ -119,18 +113,14 @@ class WebSocketHandler(websocket.WebSocketHandler):
         'x': time.time()
     }
 
-    #print point_data
-
     #write the json object to the socket
     self.write_message(json.dumps(point_data))
 
     #create new ioloop instance to intermittently publish data
     ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=1), self.send_data)
 
-
 if __name__ == "__main__":
-  #create websocket endpoint accessible at /websocket
-  print "Starting websocket server program. Awaiting client requests to open websocket ..."
+  print "Starting main..."
   HarkSaas = HarkSaas()
   harkclient = HarkSaas.authenticate()
   application = web.Application([
@@ -140,8 +130,5 @@ if __name__ == "__main__":
      dict(path=settings['static_path'])),
     ], **settings)
 
-  http_server = httpserver.HTTPServer(application)
-  http_server.listen(80)
-  application.listen(8888)
-
+  application.listen(listen_port)
   ioloop.IOLoop.instance().start()
