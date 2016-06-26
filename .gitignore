@@ -92,3 +92,5 @@ harkenv/
 # Filesystem
 .DS_Store
 
+# Data
+.json
