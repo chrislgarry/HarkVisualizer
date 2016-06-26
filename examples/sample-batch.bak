@@ -52,10 +52,9 @@ if __name__ == "__main__":
     print("Uploading file...")
     obj.uploadFile(open(filename, 'rb'))
     print("Waiting for the process...")
+    obj.wait(debug=True)
 
-    while True:
-      time.sleep(1)
-      ## show results
-      ret = obj.getResults() 
-      pprint.pprint(ret['context'])
+    ## show results
+    ret = obj.getResults()
+    pprint.pprint(ret)
 

@@ -1,8 +1,10 @@
+import sys
 import time
 import random
 import json
 import datetime
 import os
+import pyhark.saas
 from tornado import websocket, web, ioloop, httpserver
 from werkzeug.utils import secure_filename
 from datetime import timedelta
@@ -19,8 +21,22 @@ settings = {
     "template_path": os.path.join(os.path.dirname(__file__), TEMPLATE_PATH),
 }
 
+
 paymentTypes = ["cash", "tab", "visa","mastercard","bitcoin"]
 namesArray = ['Ben', 'Jarrod', 'Vijay', 'Aziz']
+metadata = {   
+        "processType": "batch",
+        "params": {
+            "numSounds": 2,
+            "roomName": "sample room",
+            "micName": "dome",
+            "thresh": 21
+        },
+        "sources": [
+            {"from": -180, "to": 0},
+            {"from": 0, "to": 180},
+        ]
+    }
 
 class Index(web.RequestHandler):
     def get(self):
@@ -33,8 +49,10 @@ class Index(web.RequestHandler):
         file = self.request.files['file'][0]
         if file and allowed_file(file['filename']):
             filename = secure_filename(file['filename'])
-            filehandle = open(UPLOAD_FOLDER + filename, 'w')
-            filehandle.write(file['body'])
+            writehandle = open(UPLOAD_FOLDER + filename, 'w')
+            writehandle.write(file['body'])
+            readhandle = open(UPLOAD_FOLDER + filename, 'rb')
+            harkclient.uploadFile(readhandle)
         self.render("visualize.html")
 
 
@@ -42,7 +60,21 @@ class Index(web.RequestHandler):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+class HarkSaas:
 
+  def authenticate(self):
+    auth = json.load(open("harkauth.json"))
+    client = pyhark.saas.PyHarkSaaS(auth["apikey"], auth["apisec"]) 
+    client.login()
+    client.createSession(metadata)
+    return client
+
+  def upload(metadata, client, filename):
+    client.createSession(metadata)
+    client.uploadFile(open(filename, 'rb'))
+
+  def getLatestResults(client):
+    return client.getResults()
 
 class WebSocketHandler(websocket.WebSocketHandler):
 
@@ -95,10 +127,12 @@ class WebSocketHandler(websocket.WebSocketHandler):
     #create new ioloop instance to intermittently publish data
     ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=1), self.send_data)
 
+
 if __name__ == "__main__":
   #create websocket endpoint accessible at /websocket
   print "Starting websocket server program. Awaiting client requests to open websocket ..."
-
+  HarkSaas = HarkSaas()
+  harkclient = HarkSaas.authenticate()
   application = web.Application([
     (r'/', Index),
     (r'/websocket', WebSocketHandler),
