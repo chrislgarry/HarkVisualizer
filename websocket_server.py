@@ -5,6 +5,8 @@ import json
 import datetime
 import os
 import pyhark.saas
+import speech_recognition
+from os import path
 from tornado import websocket, web, ioloop, httpserver
 from werkzeug.utils import secure_filename
 from datetime import timedelta
@@ -15,14 +17,14 @@ ALLOWED_EXTENSIONS = set(['flac', 'wav', 'ogg'])
 STATIC_PATH = "static"
 TEMPLATE_PATH = "templates"
 listen_port=80
+BING_KEY = ''
+AUDIO_FILE= ''
 
 settings = {
     "static_path": os.path.join(os.path.dirname(__file__), STATIC_PATH),
     "template_path": os.path.join(os.path.dirname(__file__), TEMPLATE_PATH),
 }
 
-paymentTypes = ["cash", "tab", "visa","mastercard","bitcoin"]
-namesArray = ['Ben', 'Jarrod', 'Vijay', 'Aziz']
 metadata = {   
         "processType": "batch",
         "params": {
@@ -46,30 +48,28 @@ class Index(web.RequestHandler):
         file = self.request.files['file'][0]
         if file and allowed_file(file['filename']):
             filename = secure_filename(file['filename'])
-            writehandle = open(UPLOAD_FOLDER + filename, 'w')
+            AUDIO_FILE = UPLOAD_FOLDER + filename
+            writehandle = open(AUDIO_FILE, 'w')
             writehandle.write(file['body'])
-            readhandle = open(UPLOAD_FOLDER + filename, 'rb')
+            readhandle = open(AUDIO_FILE, 'rb')
+            harkclient.createSession(metadata)
             harkclient.uploadFile(readhandle)
         self.render("visualize.html")
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+  return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 class HarkSaas:
-
-  def authenticate(self):
+  def client(self):
     auth = json.load(open("harkauth.json"))
     client = pyhark.saas.PyHarkSaaS(auth["apikey"], auth["apisec"]) 
     client.login()
-    client.createSession(metadata)
     return client
 
-  def upload(metadata, client, filename):
-    client.createSession(metadata)
-    client.uploadFile(open(filename, 'rb'))
-
-  def getLatestResults(client):
-    return client.getResults()
+class SpeechRecognition:
+  def client(self):
+    BING_KEY = json.load(open("bingauth.json"))["apikey"];
+    return  speech_recognition.Recognizer();
 
 class WebSocketHandler(websocket.WebSocketHandler):
 
@@ -86,35 +86,28 @@ class WebSocketHandler(websocket.WebSocketHandler):
 
  #close connection
   def on_close(self):
+    #delete hark session, wipe UPLOAD_PATH, and close/reset anything else 
     print 'Connection closed.'
 
   # Our function to send new (random) data for charts
   def send_data(self):
     print "Sending Data"
-
-    #create a bunch of random data for various dimensions we want
-    #instead, pull data from hark here
-    qty = random.randrange(1,4)
-    total = random.randrange(30,1000)
-    tip = random.randrange(10, 100)
-    payType = paymentTypes[random.randrange(0,4)]
-    name = namesArray[random.randrange(0,4)]
-    spent = random.randrange(1,150);
-    year = random.randrange(2012,2016)
-    #create a new data point
-    point_data = {
-        'quantity': qty,
-        'total' : total,
-        'tip': tip,
-        'payType': payType,
-        'Name': name,
-        'Spent': spent,
-        'Year' : year,
-        'x': time.time()
-    }
-
-    #write the json object to the socket
-    self.write_message(json.dumps(point_data))
+    
+    data = harkclient.getResults()
+    harkclient.wait()
+    if data['context']:
+        for entry in data['context']:
+               filename = 'part' + str(entry['srcID']) + '.flac'
+	       with open(filename, 'w') as filehandle:
+	         harkclient.getSeparatedAudio(handle=filehandle, srcID=entry['srcID'])
+               print(path.join(path.dirname(path.realpath(__file__)), filename))
+	       with speech_recognition.AudioFile(path.join(path.dirname(path.realpath(__file__)), filename)) as source:
+	         audio = speechclient.record(source)
+	       utterance = speechclient.recognize_bing(audio, key=BING_KEY, language="ja-JP")
+               #self.write_message(filelocation)
+	       #write the json object to the socket
+	       #self.write_message(json.dumps(data['scene']))
+	       self.write_message(utterance)
 
     #create new ioloop instance to intermittently publish data
     ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=1), self.send_data)
@@ -122,7 +115,9 @@ class WebSocketHandler(websocket.WebSocketHandler):
 if __name__ == "__main__":
   print "Starting main..."
   HarkSaas = HarkSaas()
-  harkclient = HarkSaas.authenticate()
+  SpeechRecognition = SpeechRecognition()
+  harkclient = HarkSaas.client()
+  speechclient = SpeechRecognition.client()
   application = web.Application([
     (r'/', Index),
     (r'/websocket', WebSocketHandler),
