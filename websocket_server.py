@@ -66,11 +66,6 @@ class HarkSaas:
     client.login()
     return client
 
-class SpeechRecognition:
-  def client(self):
-    BING_KEY = json.load(open("bingauth.json"))["apikey"];
-    return  speech_recognition.Recognizer();
-
 class WebSocketHandler(websocket.WebSocketHandler):
 
   #override the default cross-origin check
@@ -92,32 +87,44 @@ class WebSocketHandler(websocket.WebSocketHandler):
   # Our function to send new (random) data for charts
   def send_data(self):
     print "Sending Data"
-    
-    data = harkclient.getResults()
+    BING_KEY = json.load(open("bingauth.json"))["apikey"];
+    speechclient = speech_recognition.Recognizer();
     harkclient.wait()
+    data = harkclient.getResults()
+    print("finished waiting for hark session")
+    print(str(data['context']))
     if data['context']:
         for entry in data['context']:
+               utterance='Inaudible'
                filename = 'part' + str(entry['srcID']) + '.flac'
+               print("creating separated audio filehandle %s", filename)
 	       with open(filename, 'w') as filehandle:
 	         harkclient.getSeparatedAudio(handle=filehandle, srcID=entry['srcID'])
-               print(path.join(path.dirname(path.realpath(__file__)), filename))
+               print("retrieved and saved %s", filename)
 	       with speech_recognition.AudioFile(path.join(path.dirname(path.realpath(__file__)), filename)) as source:
 	         audio = speechclient.record(source)
-	       utterance = speechclient.recognize_bing(audio, key=BING_KEY, language="ja-JP")
+               print("loaded separated audio file to speech client")
+               try:
+	         utterance = speechclient.recognize_bing(audio, key="5af35430ceb54218bf41eb054a38103d", language="ja-JP")
+                 print("response received from bing speech api") 
+               except speech_recognition.UnknownValueError:
+                 print("Inaudible utterance detected")
+                 pass
+               print("removing separated audio file %s", filename)
+               os.remove(filename)
+               print("removed")
                #self.write_message(filelocation)
 	       #write the json object to the socket
 	       #self.write_message(json.dumps(data['scene']))
 	       self.write_message(utterance)
-
+               time.sleep(2)
     #create new ioloop instance to intermittently publish data
-    ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=1), self.send_data)
+    #ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=1), self.send_data)
 
 if __name__ == "__main__":
   print "Starting main..."
   HarkSaas = HarkSaas()
-  SpeechRecognition = SpeechRecognition()
   harkclient = HarkSaas.client()
-  speechclient = SpeechRecognition.client()
   application = web.Application([
     (r'/', Index),
     (r'/websocket', WebSocketHandler),
