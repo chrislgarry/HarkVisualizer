@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    	<title>Hark Visualizer</title>
+        <link rel=stylesheet type=text/css href="{{ static_url("css/style.css") }}"></link>
+    </head>
+
+	<body>
+		<div class="header">
+	        <h1>
+			    <svg class="logo-sign" xmlns="http://www.w3.org/2000/svg" width="54" height="30" viewBox="-55 25 60 30" fill="#FFFFFF">
+				    <g class="logo-sign__box">
+					    <polygon class="logo-sign__line" points="-1,37.333 -1,42.667 -3,44 -3,36"/>
+					    <polygon class="logo-sign__line" points="-5,33.333 -5,46.667 -7,48 -7,32"/>
+					    <polygon class="logo-sign__line" points="-9,29.333 -9,50.667 -11,52 -11,28"/>
+					    <polygon class="logo-sign__line" points="-13.5,25 -13,25.333 -13,54.667 -13.5,55 -15,54 -15,26"/>
+					    <polygon class="logo-sign__line" points="-17,28.667 -17,51.333 -19,50 -19,30"/>
+					    <polygon class="logo-sign__line" points="-21,32.667 -21,47.333 -23,46 -23,34"/>
+					    <polygon class="logo-sign__line" points="-25,36.667 -25,43.333 -27,42 -27,38"/>
+				    </g>
+				    <g class="logo-sign__box">
+					    <polygon class="logo-sign__line" points="-31,36.667 -31,43.333 -29,42 -29,38"/>
+					    <polygon class="logo-sign__line" points="-35,32.667 -35,47.333 -33,46 -33,34"/>
+					    <polygon class="logo-sign__line" points="-39,28.667 -39,51.333 -37,50 -37,30"/>
+					    <polygon class="logo-sign__line" points="-42.5,25 -43,25.333 -43,54.667 -42.5,55 -41,54 -41,26"/>
+					    <polygon class="logo-sign__line" points="-47,29.333 -47,50.667 -45,52 -45,28"/>
+					    <polygon class="logo-sign__line" points="-51,33.333 -51,46.667 -49,48 -49,32"/>
+					    <polygon class="logo-sign__line" points="-55,37.333 -55,42.667 -53,44 -53,36"/>
+				    </g>
+			    </svg>
+			    Hark Visualizer
+	        </h1>
+	    </div>
+
+	    <div id="content" class="centered">
+                <p id="data"></p>
+		<script>
+                    var connection = new WebSocket('ws://harkvisualizer.com/websocket');
+                    connection.onmessage = function(event) {
+	                var newData = event.data;
+                        console.log(newData)
+		        document.getElementById("data").innerHTML = newData;	
+		    }
+		</script>
+	    </div>
+	</body>
+</html>
