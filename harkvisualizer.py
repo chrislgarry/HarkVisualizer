@@ -1,7 +1,7 @@
 from datetime import timedelta 
 import json 
 import logging as log 
-from os import path, remove 
+from os import path, remove, listdir 
 from time import sleep 
  
 import pyhark.saas 
@@ -79,22 +79,29 @@ class WebSocketHandler(websocket.WebSocketHandler):
     #allow cross-origin web socket connection 
     def check_origin(self, origin): 
         return True 
- 
-    #on open of this socket 
+
+    def clean_staging(self):
+        uploads = listdir(UPLOAD_PATH)
+        for file in uploads:
+            remove(UPLOAD_PATH + file)
+        log.info('Deleted contents of upload path')
+        hark_client.deleteSession()
+        log.info('Deleted hark session')
+
+    # Invoked when anyone closes the socket
+    def on_connection_close(self):
+        self.clean_staging()
+
+    # Called upon open of this socket 
     def open(self): 
         log.info('Connection established') 
-        #ioloop to wait for 3 seconds before starting to send data 
-        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=3),  
+        # ioloop to wait for 2 seconds before sending data 
+        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=2),  
                                              self.send_data) 
- 
-    #close connection 
-    def on_close(self):
-        remove(UPLOAD_PATH) 
-        #delete hark session, wipe UPLOAD_PATH, and close/reset anything else  
-        log.info('Connection closed') 
  
     def send_data(self): 
         speech_client = speech_recognition.Recognizer(); 
+        auth = json.load(open('bingauth.json'))
         log.info('Hark is processing the file') 
         hark_client.wait() 
         data = hark_client.getResults() 
@@ -117,7 +124,7 @@ class WebSocketHandler(websocket.WebSocketHandler):
  
                 try: 
                     utterance = speech_client.recognize_bing(audio,  
-                        key='5af35430ceb54218bf41eb054a38103d',  
+                        key=str(auth['apikey']),  
                         language=LANGUAGE) 
                     log.info('Transcription for part %d: %s', entry['srcID'], utterance) 
                 # Thrown if utterance cannot be translated to text. 
@@ -130,7 +137,8 @@ class WebSocketHandler(websocket.WebSocketHandler):
                 self.write_message(utterance) 
                 #create new ioloop instance to intermittently publish data 
                 #ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1), self.send_data) 
- 
+
+
 # Helper functions 
 def allowed_file(file_name): 
     extension = file_name.rsplit('.', 1)[1] 
