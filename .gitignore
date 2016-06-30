@@ -93,4 +93,4 @@ harkenv/
 .DS_Store
 
 # Data
-.json
+*.json
