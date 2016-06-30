@@ -40,7 +40,7 @@
 	    <div id="content" class="centered">
                 <p id="data"></p>
 		<script>   
-                    var connection = new WebSocket('ws://52.197.50.219/websocket');
+                    var connection = new WebSocket('ws://harkvisualizer.com/websocket');
 		    connection.onmessage = function(event) {
 	                var newData = event.data;
                         console.log(newData)
