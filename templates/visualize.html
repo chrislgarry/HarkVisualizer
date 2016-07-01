@@ -93,13 +93,21 @@
                 connection.onmessage = function(event) {
                     // resetData();
                     var newData = JSON.parse(event.data);
-                    for(entry in newData){
+                    console.log(newData)
+                    contexts = newData.context;
+                    console.log(contexts)
+                    for(entry = 0; entry < contexts.length; entry++){
+                        guid = contexts[entry].guid
+                        elevation = contexts[entry].elevation
+                        duration = contexts[entry].duration
+                        azimuth = contexts[entry].azimuth
                         var updateObject =[{
-                            "guid": entry.guid,
-                            "elevation": entry.elevation,
-                            "duration": entry.duration,
-                            "azimuth": entry.azimuth
+                            "guid": guid,
+                            "elevation": elevation,
+                            "duration": duration,
+                            "azimuth": azimuth
                         }]
+                        console.log(guid, elevation, duration, azimuth)
                         xfilter.add(updateObject);
                         dc.redrawAll();
                     }
@@ -108,3 +116,4 @@
         </div>
     </body>
 </html>
+
