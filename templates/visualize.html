@@ -50,23 +50,23 @@
                 var connection = new WebSocket('ws://harkvisualizer.com/websocket');
 
                 var data1 = [
-                    {guid: 'Alice', elevation: 1, duration: 1, azimuth: 1},
-                    {guid: 'Bob',   elevation: 1, duration: 1, azimuth: 2},
+                    {guid: 'Alice', azimuth: 1, duration: 1},
+                    {guid: 'Bob',   azimuth: 1, duration: 1}
                 ];
 
                 // set crossfilter with first dataset
                 var xfilter = crossfilter(data1),
                     durationDim  = xfilter.dimension(function(d) {return +d.duration;}),
-                    elevationDim = xfilter.dimension(function(d) {return d.elevation;}),
+                    azimuthDim = xfilter.dimension(function(d) {return d.azimuth;}),
                     guidDim  = xfilter.dimension(function(d) {return d.guid;}),
                   
-                    durationPerElev = elevationDim.group().reduceSum(function(d) {return +d.duration;}),
+                    durationPerAzim = azimuthDim.group().reduceSum(function(d) {return +d.duration;}),
                     durationPerName = guidDim.group().reduceSum(function(d) {return +d.duration;});
 
                 function render_plots(){
                     durationRingChart
                         .width(250).height(250)
-                        .dimension(elevationDim)
+                        .dimension(azimuthDim)
                         .group(durationPerElev)
                         .innerRadius(100);
                     speakersRowChart
@@ -98,16 +98,14 @@
                     console.log(contexts)
                     for(entry = 0; entry < contexts.length; entry++){
                         guid = contexts[entry].guid
-                        elevation = contexts[entry].elevation
-                        duration = contexts[entry].duration
                         azimuth = contexts[entry].azimuth
+                        duration = contexts[entry].duration
                         var updateObject =[{
                             "guid": guid,
-                            "elevation": elevation,
-                            "duration": duration,
-                            "azimuth": azimuth
+                            "azimuth": azimuth,
+                            "duration": duration
                         }]
-                        console.log(guid, elevation, duration, azimuth)
+                        console.log(guid, azimuth, duration)
                         xfilter.add(updateObject);
                         dc.redrawAll();
                     }
