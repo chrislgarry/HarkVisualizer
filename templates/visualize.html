@@ -41,6 +41,9 @@
 
             <div id="chart-ring-duration"></div>
             <div id="chart-row-speakers"></div>
+
+            var connection = new WebSocket('ws://harkvisualizer.com/websocket');
+
             <script type="text/javascript">
                 var durationRingChart   = dc.pieChart("#chart-ring-duration"),
                     speakersRowChart = dc.rowChart("#chart-row-speakers");
