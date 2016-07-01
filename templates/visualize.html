@@ -45,17 +45,17 @@
                 var durationRingChart   = dc.pieChart("#chart-ring-duration"),
                     speakersRowChart = dc.rowChart("#chart-row-speakers");
                 var data1 = [
-                    {Name: 'Alice', Elevation: 1, Duration: 1, Azimuth: 1},
-                    {Name: 'Bob',   Elevation: 1, Duration: 1, Azimuth: 2},
+                    {guid: 'Alice', elevation: 1, duration: 1, azimuth: 1},
+                    {guid: 'Bob',   elevation: 1, duration: 1, azimuth: 2},
                 ];
                 // set crossfilter with first dataset
                 var xfilter = crossfilter(data1),
-                    durationDim  = xfilter.dimension(function(d) {return +d.Duration;}),
-                    elevationDim = xfilter.dimension(function(d) {return d.Elevation;}),
-                    nameDim  = xfilter.dimension(function(d) {return d.Name;}),
+                    durationDim  = xfilter.dimension(function(d) {return +d.duration;}),
+                    elevationDim = xfilter.dimension(function(d) {return d.elevation;}),
+                    guidDim  = xfilter.dimension(function(d) {return d.guid;}),
                   
-                    durationPerElev = elevationDim.group().reduceSum(function(d) {return +d.Duration;}),
-                    durationPerName = nameDim.group().reduceSum(function(d) {return +d.Duration;});
+                    durationPerElev = elevationDim.group().reduceSum(function(d) {return +d.duration;}),
+                    durationPerName = guidDim.group().reduceSum(function(d) {return +d.duration;});
                 function render_plots(){
                     durationRingChart
                         .width(400).height(400)
@@ -64,14 +64,39 @@
                         .innerRadius(100);
                     speakersRowChart
                         .width(550).height(400)
-                        .dimension(nameDim)
+                        .dimension(guidDim)
                         .group(durationPerName)
                         .elasticX(true);
                     dc.renderAll();
                 }
 
                 render_plots();
-               
+
+                // data reset function (adapted)
+                function resetData(ndx, dimensions) {
+                    var durationChartFilters = durationRingChart.filters();
+                    var speakerChartFilters = speakersRowChart.filters();
+                    durationRingChart.filter(null);
+                    speakersRowChart.filter(null);
+                    xfilter.remove();
+                    durationRingChart.filter([durationChartFilters]);
+                    speakersRowChart.filter([speakerChartFilters]);
+                }
+
+                connection.onmessage = function(event) {
+                    resetData(ndx, [nameDim, elevationDim, durationDim]);
+                    var newData = JSON.parse(event.data);
+                    for(entry in newData){
+                        var updateObject =[{
+                            "guid": entry.guid,
+                            "elevation": entry.elevation,
+                            "duration": entry.duration,
+                            "azimuth": entry.azimuth
+                        }]
+                        xfilter.add(updateObject);
+                        dc.redrawAll();
+                    }
+                }
             </script>
         </div>
     </body>
