@@ -80,7 +80,7 @@
                 render_plots();
 
                 // data reset function (adapted)
-                function resetData(ndx, dimensions) {
+                function resetData() {
                     var durationChartFilters = durationRingChart.filters();
                     var speakerChartFilters = speakersRowChart.filters();
                     durationRingChart.filter(null);
@@ -91,7 +91,7 @@
                 }
 
                 connection.onmessage = function(event) {
-                    resetData(ndx, [nameDim, elevationDim, durationDim]);
+                    resetData();
                     var newData = JSON.parse(event.data);
                     for(entry in newData){
                         var updateObject =[{
