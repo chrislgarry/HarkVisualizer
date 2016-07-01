@@ -58,12 +58,12 @@
                     durationPerName = nameDim.group().reduceSum(function(d) {return +d.Duration;});
                 function render_plots(){
                     durationRingChart
-                        .width(200).height(200)
+                        .width(400).height(400)
                         .dimension(elevationDim)
                         .group(durationPerElev)
-                        .innerRadius(50);
+                        .innerRadius(100);
                     speakersRowChart
-                        .width(250).height(200)
+                        .width(550).height(400)
                         .dimension(nameDim)
                         .group(durationPerName)
                         .elasticX(true);
