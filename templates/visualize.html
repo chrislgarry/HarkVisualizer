@@ -79,19 +79,19 @@
 
                 render_plots();
 
-                // data reset function (adapted)
-                function resetData() {
-                    var durationChartFilters = durationRingChart.filters();
-                    var speakerChartFilters = speakersRowChart.filters();
-                    durationRingChart.filter(null);
-                    speakersRowChart.filter(null);
-                    xfilter.remove();
-                    durationRingChart.filter([durationChartFilters]);
-                    speakersRowChart.filter([speakerChartFilters]);
-                }
+                // // data reset function (adapted)
+                // function resetData() {
+                //     var durationChartFilters = durationRingChart.filters();
+                //     var speakerChartFilters = speakersRowChart.filters();
+                //     durationRingChart.filter(null);
+                //     speakersRowChart.filter(null);
+                //     xfilter.remove();
+                //     durationRingChart.filter([durationChartFilters]);
+                //     speakersRowChart.filter([speakerChartFilters]);
+                // }
 
                 connection.onmessage = function(event) {
-                    resetData();
+                    // resetData();
                     var newData = JSON.parse(event.data);
                     for(entry in newData){
                         var updateObject =[{
