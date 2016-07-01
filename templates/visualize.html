@@ -65,12 +65,12 @@
 
                 function render_plots(){
                     durationRingChart
-                        .width(300).height(300)
+                        .width(250).height(250)
                         .dimension(elevationDim)
                         .group(durationPerElev)
                         .innerRadius(100);
                     speakersRowChart
-                        .width(450).height(300)
+                        .width(400).height(250)
                         .dimension(guidDim)
                         .group(durationPerName)
                         .elasticX(true);
@@ -79,19 +79,19 @@
 
                 render_plots();
 
-                // // data reset function (adapted)
-                // function resetData() {
-                //     var durationChartFilters = durationRingChart.filters();
-                //     var speakerChartFilters = speakersRowChart.filters();
-                //     durationRingChart.filter(null);
-                //     speakersRowChart.filter(null);
-                //     xfilter.remove();
-                //     durationRingChart.filter([durationChartFilters]);
-                //     speakersRowChart.filter([speakerChartFilters]);
-                // }
+                // data reset function (adapted)
+                function resetData() {
+                    var durationChartFilters = durationRingChart.filters();
+                    var speakerChartFilters = speakersRowChart.filters();
+                    durationRingChart.filter(null);
+                    speakersRowChart.filter(null);
+                    xfilter.remove();
+                    durationRingChart.filter([durationChartFilters]);
+                    speakersRowChart.filter([speakerChartFilters]);
+                }
 
                 connection.onmessage = function(event) {
-                    // resetData();
+                    resetData();
                     var newData = JSON.parse(event.data);
                     console.log(newData)
                     contexts = newData.context;
