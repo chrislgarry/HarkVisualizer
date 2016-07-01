@@ -42,15 +42,18 @@
             <div id="chart-ring-duration"></div>
             <div id="chart-row-speakers"></div>
 
-            var connection = new WebSocket('ws://harkvisualizer.com/websocket');
 
             <script type="text/javascript">
                 var durationRingChart   = dc.pieChart("#chart-ring-duration"),
                     speakersRowChart = dc.rowChart("#chart-row-speakers");
+
+                var connection = new WebSocket('ws://harkvisualizer.com/websocket');
+
                 var data1 = [
                     {guid: 'Alice', elevation: 1, duration: 1, azimuth: 1},
                     {guid: 'Bob',   elevation: 1, duration: 1, azimuth: 2},
                 ];
+
                 // set crossfilter with first dataset
                 var xfilter = crossfilter(data1),
                     durationDim  = xfilter.dimension(function(d) {return +d.duration;}),
@@ -59,6 +62,7 @@
                   
                     durationPerElev = elevationDim.group().reduceSum(function(d) {return +d.duration;}),
                     durationPerName = guidDim.group().reduceSum(function(d) {return +d.duration;});
+
                 function render_plots(){
                     durationRingChart
                         .width(400).height(400)
