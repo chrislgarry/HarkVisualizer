@@ -37,8 +37,8 @@ default_hark_config = {
         'thresh': 21
     },
     'sources': [
-        {'from': -180, 'to': 0},
         {'from': 0, 'to': 180},
+        {'from': -180, 'to': 0},
     ]
 }
 
@@ -47,19 +47,20 @@ class HttpRequestHandler(web.RequestHandler):
 
 
     def get(self):
-        self.render('index.html')
+       self.render('index.html')
 
     def post(self):
         if 'file' not in self.request.files:
             self.render('index.html')
         file = self.request.files['file'][0]
         if file and allowed_file(file['filename']):
+            # Create session should be coroutined
+            hark.client.createSession(default_hark_config)
             file_name = secure_filename(file['filename'])
             audio_file = STAGING_AREA + file_name
             write_handle = open(audio_file, 'w')
             write_handle.write(file['body'])
             read_handle = open(audio_file, 'rb')
-            hark.client.createSession(default_hark_config)
             hark.upload_file(read_handle)
             self.render('visualize.html')
 
@@ -81,8 +82,8 @@ class Hark:
                                           srcID=srcID)
 
     def delete_session(self):
-        log.info('Deleting hark session %s', self.client.getSessionID())
         self.client.deleteSession()
+        log.info('Deleted hark session %s', self.client.getSessionID())
 
     def upload_file(self, file_handle):
         log.info('Uploading file %s to hark', file_handle.name)
@@ -139,21 +140,36 @@ class WebSocketHandler(websocket.WebSocketHandler):
     # Invoked when socket is opened
     def open(self):
         log.info('Web socket connection established')
-        # ioloop to wait for 2 seconds before sending data 
-        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=2),
+        # Do not hold packets for bandwidth optimization
+        self.set_nodelay(True)
+        # ioloop to wait before attempting to sending data 
+        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1),
                                              self.send_data)
 
-    def send_data(self):
-        if hark.is_finished():
-            self.close()
-        data = hark.get_results()
-        log.info('Latest hark analysis results:')
-        log.info(str(data['context']))
-        # If there is context data available, send it to browser w/o memoization
-        if data['context']:
-            self.write_message(json.dumps(data))
+    def send_data(self, utterances_memo = []):
+        results = hark.get_results()
+        utterances = results['context']
+#Split this out into a coroutine
+        # If result contains more utterances than memo
+        if len(utterances) > len(utterances_memo):
+            # Must iterate since new utterances
+            # could be anywhere in the result
+            for utterance in utterances:
+                utterance_id = utterance['srcID']
+                # If utterance is new
+                if utterance_id not in utterances_memo:
+                    # Memoize the srcID
+                    utterances_memo.append(utterance_id)
+                    self.write_message(json.dumps(utterance))
+                    log.info("Utterance %d written to socket", utterance_id)
 
-        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1), self.send_data)
+        if hark.is_finished():
+            # If we have all the utterances, close the socket
+            if sum(results['scene']['numSounds'].values()) == len(utterances_memo):
+                del utterances_memo[:]
+                self.close()
+        else:
+            ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1), self.send_data)
 
 
 # Helper functions

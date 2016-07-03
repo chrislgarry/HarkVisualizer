@@ -17,6 +17,7 @@ Pygments==2.1.3
 pyhark==0.1.0
 pyOpenSSL==16.0.0
 requests==2.10.0
+simplejson==3.8.2
 singledispatch==3.4.0.3
 six==1.10.0
 SpeechRecognition==3.4.6
