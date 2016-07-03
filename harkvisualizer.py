@@ -12,7 +12,6 @@ from tornado import web, ioloop, websocket
 from werkzeug.utils import secure_filename
 
 STAGING_AREA = '/tmp/'
-ALLOWED_EXTENSIONS = set(['flac', 'wav'])
 STATIC_PATH = 'static'
 HTML_TEMPLATE_PATH = 'templates'
 LISTEN_PORT = 80
@@ -50,17 +49,13 @@ class HttpRequestHandler(web.RequestHandler):
        self.render('index.html')
 
     def post(self):
-        if 'file' not in self.request.files:
-            self.render('index.html')
-        file = self.request.files['file'][0]
-        if file and allowed_file(file['filename']):
-            # Create session should be coroutined
-            hark.client.createSession(default_hark_config)
+            file = self.request.files['file'][0]
             file_name = secure_filename(file['filename'])
             audio_file = STAGING_AREA + file_name
             write_handle = open(audio_file, 'w')
             write_handle.write(file['body'])
             read_handle = open(audio_file, 'rb')
+            hark.client.createSession(default_hark_config)
             hark.upload_file(read_handle)
             self.render('visualize.html')
 
@@ -89,6 +84,7 @@ class Hark:
         log.info('Uploading file %s to hark', file_handle.name)
         self.client.uploadFile(file_handle)
 
+    # Wrap these for additional code in the future
     def get_results(self):
         return self.client.getResults()
 
@@ -97,6 +93,9 @@ class Hark:
 
     def is_finished(self):
         return self.client.isFinished()
+
+    def session_id(self):
+        return self.client.getSessionID()
 
 
 # Wrapper around SpeechRecognition
@@ -172,14 +171,10 @@ class WebSocketHandler(websocket.WebSocketHandler):
             ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1), self.send_data)
 
 
-# Helper functions
-def allowed_file(file_name):
-    extension = file_name.rsplit('.', 1)[1]
-    return '.' in file_name and extension in ALLOWED_EXTENSIONS
-
 def clean_staging():
    remove_all(STAGING_AREA)
-   hark.delete_session()
+   if hark.session_id():
+       hark.delete_session()
 
 def get_app():
     application = web.Application([

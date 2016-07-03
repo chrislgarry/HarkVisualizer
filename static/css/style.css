@@ -116,14 +116,7 @@ body {
   margin: 0 auto 1em;
   display: inline-block;
   vertical-align: top;
+  visibility: hidden;
 }
 
-
-/*
-  Set the color of the icon
-*/
-
-/*svg path,
-svg rect {
-  fill: #FF0000;
-}*/
+:focus { outline: none; }
