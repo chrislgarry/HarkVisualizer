@@ -2,8 +2,9 @@ import atexit
 from datetime import timedelta
 import simplejson as json
 import logging as log
-from os import path, remove, listdir
-from time import sleep
+import os
+from random import choice
+from string import ascii_uppercase
 
 import pyhark.saas
 import speech_recognition
@@ -23,8 +24,8 @@ log.basicConfig(
 )
 
 settings = {
-'static_path': path.join(path.dirname(__file__), STATIC_PATH),
-'template_path': path.join(path.dirname(__file__), HTML_TEMPLATE_PATH)
+'static_path': os.path.join(os.path.dirname(__file__), STATIC_PATH),
+'template_path': os.path.join(os.path.dirname(__file__), HTML_TEMPLATE_PATH)
 }
 
 default_hark_config = {
@@ -51,13 +52,16 @@ class HttpRequestHandler(web.RequestHandler):
     def post(self):
             file = self.request.files['file'][0]
             file_name = secure_filename(file['filename'])
-            audio_file = STAGING_AREA + file_name
+            # Best effort to ensure same file name is unique per post
+            random_string = ''.join(choice(ascii_uppercase) for i in range(10))
+            audio_file = '{0}{1}_{2}'.format(STAGING_AREA, random_string, file_name)
             write_handle = open(audio_file, 'w')
             write_handle.write(file['body'])
             read_handle = open(audio_file, 'rb')
             hark.client.createSession(default_hark_config)
             hark.upload_file(read_handle)
             self.render('visualize.html')
+
 
 # Wrapper around PyHarkSaas
 class Hark:
@@ -109,8 +113,8 @@ class Speech:
 
     def translate(self, file_name):
         transcription = 'Inaudible'
-        with speech_recognition.AudioFile(path.join(path.dirname(
-            path.realpath(__file__)), file_name)) as source:
+        with speech_recognition.AudioFile(os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), file_name)) as source:
             audio = self.client.record(source)
         log.info('Sending separated audio file to speech api')
         try:
@@ -148,7 +152,6 @@ class WebSocketHandler(websocket.WebSocketHandler):
     def send_data(self, utterances_memo = []):
         results = hark.get_results()
         utterances = results['context']
-#Split this out into a coroutine
         # If result contains more utterances than memo
         if len(utterances) > len(utterances_memo):
             # Must iterate since new utterances
@@ -180,16 +183,16 @@ def get_app():
     application = web.Application([
         (r'/', HttpRequestHandler),
         (r'/websocket', WebSocketHandler),
-        (r'/(apple-touch-icon\.png)', web.StaticFileHandler,
+        (r'/favicon.ico', web.StaticFileHandler,
             dict(path=settings['static_path'])),
         ], **settings)
     return application
 
 def remove_all(dir):
     log.info('Deleting contents of %s', dir)
-    files = listdir(dir)
+    files = os.listdir(dir)
     for file in files:
-        remove(dir + file)
+        os.remove(dir + file)
 
 
 if __name__ == '__main__':
