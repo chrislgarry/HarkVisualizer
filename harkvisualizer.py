@@ -58,12 +58,14 @@ class HttpRequestHandler(web.RequestHandler):
             write_handle = open(audio_file, 'w')
             write_handle.write(file['body'])
             read_handle = open(audio_file, 'rb')
+            # Attempt llogin in the event that hark session logged out
+            hark.client.login()
             hark.client.createSession(default_hark_config)
             hark.upload_file(read_handle)
             self.render('visualize.html')
 
 
-# Wrapper around PyHarkSaas
+# Wrapper around some PyHarkSaas methods
 class Hark:
 
 
@@ -81,25 +83,12 @@ class Hark:
                                           srcID=srcID)
 
     def delete_session(self):
+        log.info('Deleting hark session %s', self.client.getSessionID())
         self.client.deleteSession()
-        log.info('Deleted hark session %s', self.client.getSessionID())
 
     def upload_file(self, file_handle):
         log.info('Uploading file %s to hark', file_handle.name)
         self.client.uploadFile(file_handle)
-
-    # Wrap these for additional code in the future
-    def get_results(self):
-        return self.client.getResults()
-
-    def wait(self):
-        self.client.wait()
-
-    def is_finished(self):
-        return self.client.isFinished()
-
-    def session_id(self):
-        return self.client.getSessionID()
 
 
 # Wrapper around SpeechRecognition
@@ -135,7 +124,7 @@ class WebSocketHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
-    # Invoked when socket closes or program exits
+    # Invoked when socket closed by either end
     def on_connection_close(self):
         log.info('Web socket connection closed')
         clean_staging()
@@ -146,12 +135,13 @@ class WebSocketHandler(websocket.WebSocketHandler):
         # Do not hold packets for bandwidth optimization
         self.set_nodelay(True)
         # ioloop to wait before attempting to sending data 
-        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1),
+        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
 
     def send_data(self, utterances_memo = []):
-        results = hark.get_results()
-        utterances = results['context']
+        if hark.client.getSessionID():
+            results = hark.client.getResults()
+            utterances = results['context']
         # If result contains more utterances than memo
         if len(utterances) > len(utterances_memo):
             # Must iterate since new utterances
@@ -165,9 +155,20 @@ class WebSocketHandler(websocket.WebSocketHandler):
                     self.write_message(json.dumps(utterance))
                     log.info("Utterance %d written to socket", utterance_id)
 
-        if hark.is_finished():
-            # If we have all the utterances, close the socket
+        if hark.client.isFinished():
+            # If we have all the utterances, transcribe, then close the socket
             if sum(results['scene']['numSounds'].values()) == len(utterances_memo):
+                for srcID in range(len(utterances_memo)):
+                    random_string = ''.join(choice(ascii_uppercase) for i in range(10))
+                    file_name = '{0}{1}_part{2}.flac'.format(STAGING_AREA, random_string, srcID)
+                    hark.get_audio(srcID, file_name)
+                    transcription = speech.translate(file_name)
+                    utterance = utterances[srcID]
+                    seconds, milliseconds = divmod(utterance['startTimeMs'], 1000)
+                    minutes, seconds = divmod(seconds, 60)
+                    self.write_message(json.dumps(
+                      '{0} at ({1}:{2}:{3}):'.format(utterance['guid'], minutes, seconds, milliseconds)))
+                    self.write_message(json.dumps(transcription, ensure_ascii=False))
                 del utterances_memo[:]
                 self.close()
         else:
@@ -176,7 +177,7 @@ class WebSocketHandler(websocket.WebSocketHandler):
 
 def clean_staging():
    remove_all(STAGING_AREA)
-   if hark.session_id():
+   if hark.client.getSessionID():
        hark.delete_session()
 
 def get_app():

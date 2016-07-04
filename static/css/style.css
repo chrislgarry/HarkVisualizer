@@ -1,6 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800);
 
-
 body {
   font-family: 'Open Sans', sans-serif;
 }
@@ -14,10 +13,59 @@ body {
   position: fixed;
   top: 50%;
   left: 50%;
-  /* bring your own prefixes */
   transform: translate(-50%, -50%);
   text-align: center;
 }
+
+#chatbox {
+  overflow: visible;
+  /*! margin-left: 50%; */
+  /*! margin-top: 15em; */
+  height: 30em;
+  border-style: dotted;
+  width:  75%;
+}
+
+#title{
+  text-align: center;
+}
+
+.left_dashboard {
+  float: left;
+  display:  flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 50%;
+}
+
+.right_dashboard {
+  float: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 50%;
+}
+
+.loader {
+  margin: 0 0 2em;
+  width: 20%;
+  text-align: center;
+  padding: 1em;
+  margin: 0 auto 1em;
+  display: inline-block;
+  vertical-align: top;
+  visibility: hidden;
+}
+
+#chart-row-speakers{
+  margin-left: 25%;
+}
+
+#chart-ring-duration{
+  margin-left: 33%;
+}
+
+:focus { outline: none; }
 
 
 /*Position the logo sign*/
@@ -28,10 +76,9 @@ body {
   height: 1em;
   -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
-  background-color: #FF3000;
 }
 
-/*Create the logo sign*/
+/*Create the logo sign animations*/
 
 .logo-sign__line {
   -webkit-transition: all 0.2s ease;
@@ -108,15 +155,5 @@ body {
 }
 
 
-.loader {
-  margin: 0 0 2em;
-  width: 20%;
-  text-align: center;
-  padding: 1em;
-  margin: 0 auto 1em;
-  display: inline-block;
-  vertical-align: top;
-  visibility: hidden;
-}
 
-:focus { outline: none; }
+

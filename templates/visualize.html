@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8">
         <title>Hark Visualizer</title>
-        <link rel=stylesheet type=text/css href="{{ static_url("css/style.css") }}"></link>
         <link rel=stylesheet type=text/css href="{{ static_url("css/dc.css") }}"/>
+        <link rel=stylesheet type=text/css href="{{ static_url("css/style.css") }}"></link>
         <script type="text/javascript" src="{{ static_url("js/d3.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/crossfilter.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/dc.js") }}"></script>
@@ -13,7 +13,7 @@
     <body>
         <div class="header">
             <h1>
-                <svg class="logo-sign" xmlns="http://www.w3.org/2000/svg" width="54" height="30" viewBox="-55 25 60 30" fill="#FFFFFF">
+                <svg class="logo-sign" xmlns="http://www.w3.org/2000/svg" width="54" height="30" viewBox="-55 25 60 30" fill="#FF0000">
                     <g class="logo-sign__box">
                         <polygon class="logo-sign__line" points="-1,37.333 -1,42.667 -3,44 -3,36"/>
                         <polygon class="logo-sign__line" points="-5,33.333 -5,46.667 -7,48 -7,32"/>
@@ -36,22 +36,29 @@
                 Hark Visualizer
             </h1>
         </div>
-
-        <div id="content" class="centered">
-            <p id="textbox"></p>
-            <div id="chart-ring-duration"></div>
-            <div id="chart-row-speakers"></div>
-
+        <div id="content">
+            <div class="left_dashboard">
+                <p id="title">Utterances per Azimuth (deg)</p>
+                <div id="chart-ring-duration"></div>
+                <p id="title">Duration (s) per Speaker</p>
+                <div id="chart-row-speakers"></div>
+            </div>
+            <div class="right_dashboard">
+                <p>Transcript</p>
+                <div id="chatbox"></div>
+            </div>
+        </div>
             <script type="text/javascript">
+                document.getElementById("chatbox").style.overflow = "scroll";
                 var durationRingChart   = dc.pieChart("#chart-ring-duration"),
                     speakersRowChart = dc.rowChart("#chart-row-speakers");
 
                 var connection = new WebSocket('ws://harkvisualizer.com/websocket');
-
+                var inaudible = 0;
                 // set crossfilter with first dataset
                 var xfilter = crossfilter(),
-                    durationDim  = xfilter.dimension(function(d) {return +Math.floor(d.duration);}),
-                    azimuthDim = xfilter.dimension(function(d) {return Math.floor(d.azimuth);}),
+                    durationDim  = xfilter.dimension(function(d) {return Math.floor(+d.duration);}),
+                    azimuthDim = xfilter.dimension(function(d) {return Math.floor(+d.azimuth);}),
                     guidDim  = xfilter.dimension(function(d) {return d.guid;}),
                   
                     durationPerAzim = azimuthDim.group().reduceSum(function(d) {return +d.duration;}),
@@ -62,18 +69,22 @@
                         .width(250).height(250)
                         .dimension(azimuthDim)
                         .group(durationPerAzim)
-                        .innerRadius(50);
+                        .innerRadius(50)
+                        .colors(d3.scale.category10())
+                        .label(function(d) { return d.key + "\xB0"; })
+                        .renderTitle(true);
                     speakersRowChart
                         .width(400).height(250)
                         .dimension(guidDim)
                         .group(durationPerName)
-                        .elasticX(true);
+                        .elasticX(true)
+                        .colors(d3.scale.category10())
                     dc.renderAll();
                 }
 
                 render_plots();
 
-                // data reset function (adapted)
+                // Resets the graphs
                 function resetData() {
                     var durationChartFilters = durationRingChart.filters();
                     var speakerChartFilters = speakersRowChart.filters();
@@ -84,23 +95,32 @@
                     speakersRowChart.filter([speakerChartFilters]);
                 }
 
+                // When a socket message is received
                 connection.onmessage = function(event) {
-                    //resetData();
-                    var utterance = JSON.parse(event.data);
-                    guid = utterance.guid
-                    azimuth = utterance.azimuth
-                    duration = utterance.duration
-                    console.log("guid:%s\n azimuth:%f\n duration:%f\n", guid, azimuth, duration)
-                    var updateObject =[{
-                        "guid": guid,
-                        "azimuth": azimuth,
-                        "duration": duration
-                    }]
-                    xfilter.add(updateObject);
-                    dc.redrawAll();
+                    console.log(event.data)
+                    var message = JSON.parse(event.data);
+                    // If utterance is a context result
+                    if(message.guid){
+                        // Extract values and render in graph
+                        guid = message.guid
+                        azimuth = message.azimuth
+                        duration = message.duration
+                        var updateObject =[{
+                            "guid": guid,
+                            "azimuth": azimuth,
+                           "duration": duration
+                        }]
+                        xfilter.add(updateObject);
+                        dc.redrawAll();
+                    }
+                    // If message is a transcription 
+                    else{
+                        // Render in chat box
+                        document.getElementById('chatbox').innerHTML += "<p id=\"message\">" + message + "</p>";
+                    }
                 }
+
             </script>
-        </div>
     </body>
 </html>
 
