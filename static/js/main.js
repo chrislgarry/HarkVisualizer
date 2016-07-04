@@ -47,7 +47,6 @@ function resetData() {
 
 // When a socket message is received
 connection.onmessage = function(event) {
-    console.log(event.data)
     var message = JSON.parse(event.data);
     // If utterance is a context result
     if(message.guid){
@@ -58,7 +57,7 @@ connection.onmessage = function(event) {
         var updateObject =[{
             "guid": guid,
             "azimuth": azimuth,
-           "duration": duration
+            "duration": duration
         }]
         xfilter.add(updateObject);
         dc.redrawAll();
