@@ -1,8 +1,3 @@
-// Set the chatbox to scroll overflow when text exceeds element size
-document.getElementById("chatbox").style.overflow = "scroll";
-
-var connection = new WebSocket('ws://harkvisualizer.com/websocket');
-
 var durationRingChart = dc.pieChart("#chart-ring-duration"),
     speakersRowChart = dc.rowChart("#chart-row-speakers");
 
@@ -45,6 +40,12 @@ function resetData() {
     speakersRowChart.filter([speakerChartFilters]);
 }
 
+// Set the chatbox to scroll overflow when text exceeds element size
+document.getElementById("chatbox").style.overflow = "scroll";
+
+// Connect to the remote websocket server
+var connection = new WebSocket('ws://harkvisualizer.com/websocket');
+
 // When a socket message is received
 connection.onmessage = function(event) {
     var message = JSON.parse(event.data);
@@ -67,4 +68,9 @@ connection.onmessage = function(event) {
         // Render transcription in chat box
         document.getElementById('chatbox').innerHTML += "<p id=\"message\">" + message + "</p>";
     }
+}
+
+// On close, notify the user process complete
+connection.onclose = function(event) {
+    alert('Processing complete.');
 }
