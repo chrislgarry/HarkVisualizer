@@ -5,9 +5,6 @@
         <title>Hark Visualizer</title>
         <link rel=stylesheet type=text/css href="{{ static_url("css/dc.css") }}"/>
         <link rel=stylesheet type=text/css href="{{ static_url("css/style.css") }}"></link>
-        <script type="text/javascript" src="{{ static_url("js/d3.js") }}"></script>
-        <script type="text/javascript" src="{{ static_url("js/crossfilter.js") }}"></script>
-        <script type="text/javascript" src="{{ static_url("js/dc.js") }}"></script>
     </head>
 
     <body>
@@ -48,79 +45,10 @@
                 <div id="chatbox"></div>
             </div>
         </div>
-            <script type="text/javascript">
-                document.getElementById("chatbox").style.overflow = "scroll";
-                var durationRingChart   = dc.pieChart("#chart-ring-duration"),
-                    speakersRowChart = dc.rowChart("#chart-row-speakers");
-
-                var connection = new WebSocket('ws://harkvisualizer.com/websocket');
-                var inaudible = 0;
-                // set crossfilter with first dataset
-                var xfilter = crossfilter(),
-                    durationDim  = xfilter.dimension(function(d) {return Math.floor(+d.duration);}),
-                    azimuthDim = xfilter.dimension(function(d) {return Math.floor(+d.azimuth);}),
-                    guidDim  = xfilter.dimension(function(d) {return d.guid;}),
-                  
-                    durationPerAzim = azimuthDim.group().reduceSum(function(d) {return +d.duration;}),
-                    durationPerName = guidDim.group().reduceSum(function(d) {return +d.duration;});
-
-                function render_plots(){
-                    durationRingChart
-                        .width(250).height(250)
-                        .dimension(azimuthDim)
-                        .group(durationPerAzim)
-                        .innerRadius(50)
-                        .colors(d3.scale.category10())
-                        .label(function(d) { return d.key + "\xB0"; })
-                        .renderTitle(true);
-                    speakersRowChart
-                        .width(400).height(250)
-                        .dimension(guidDim)
-                        .group(durationPerName)
-                        .elasticX(true)
-                        .colors(d3.scale.category10())
-                    dc.renderAll();
-                }
-
-                render_plots();
-
-                // Resets the graphs
-                function resetData() {
-                    var durationChartFilters = durationRingChart.filters();
-                    var speakerChartFilters = speakersRowChart.filters();
-                    durationRingChart.filter(null);
-                    speakersRowChart.filter(null);
-                    xfilter.remove();
-                    durationRingChart.filter([durationChartFilters]);
-                    speakersRowChart.filter([speakerChartFilters]);
-                }
-
-                // When a socket message is received
-                connection.onmessage = function(event) {
-                    console.log(event.data)
-                    var message = JSON.parse(event.data);
-                    // If utterance is a context result
-                    if(message.guid){
-                        // Extract values and render in graph
-                        guid = message.guid
-                        azimuth = message.azimuth
-                        duration = message.duration
-                        var updateObject =[{
-                            "guid": guid,
-                            "azimuth": azimuth,
-                           "duration": duration
-                        }]
-                        xfilter.add(updateObject);
-                        dc.redrawAll();
-                    }
-                    // If message is a transcription 
-                    else{
-                        // Render in chat box
-                        document.getElementById('chatbox').innerHTML += "<p id=\"message\">" + message + "</p>";
-                    }
-                }
-
-            </script>
+        <script type="text/javascript" src="{{ static_url("js/d3.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("js/crossfilter.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("js/dc.js") }}"></script>
+        <script type="text/javascript" src="{{ static_url("js/main.js") }}"></script>
     </body>
 </html>
 
