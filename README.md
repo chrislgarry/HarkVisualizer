@@ -1,11 +1,5 @@
-# Hark Visualizer
+#[Hark Visualizer](http://harkvisualizer.com/)
 A web app written with the Tornado framework for visualizing audio. The web app processes 8-channel flac and wav files to detect direction of sound, duration of sounds, and a transcription using speech recognition.
-
-# Specifications
-## Internal Specifications
-###Placeholder
-## External Specifications
-###Placeholder
 
 # Thirdy-Party Services
 
@@ -32,3 +26,9 @@ Used for n-dimensional filtering of multivariate datasets across D3 charts.
 
 ##[c3.js](http://c3js.org/)
 A wrapper around D3.js for building charts quickly.
+
+# Specifications
+## Internal Specifications
+###Placeholder
+## External Specifications
+###Placeholder
