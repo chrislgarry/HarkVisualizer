@@ -57,6 +57,8 @@ class HttpRequestHandler(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def post(self):
         file = self.request.files['file'][0]
+        hark.client.login()
+        hark.client.createSession(default_hark_config)
         log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
         future = pool.submit(async_upload, file)
@@ -74,9 +76,6 @@ def async_upload(file):
     write_handle = open(audio_file, 'w')
     write_handle.write(file['body'])
     read_handle = open(audio_file, 'rb')
-    # Attempt llogin in the event that hark session logged out
-    hark.client.login()
-    hark.client.createSession(default_hark_config)
     hark.upload_file(read_handle)
     log.info("Asynchronous upload complete")
 
@@ -152,7 +151,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # ioloop to wait before attempting to sending data 
         tornado.ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
-    @tornado.gen.coroutine
+ 
     def send_data(self, utterances_memo = []):
         if hark.client.getSessionID():
             results = hark.client.getResults()
