@@ -56,17 +56,17 @@ class HttpRequestHandler(tornado.web.RequestHandler):
 
     @tornado.gen.coroutine
     def post(self):
+        file = self.request.files['file'][0]
         log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
-        future = pool.submit(async_upload)
+        future = pool.submit(async_upload(file))
         yield future
         pool.shutdown()
         log.info("Rendering visualization page")
         self.render('visualize.html')
 
 # To multiprocess this, it cannot be an instance method 
-def async_upload(self):
-    file = self.request.files['file'][0]
+def async_upload(file):
     file_name = secure_filename(file['filename'])
     # Best effort to ensure same file name is unique per post
     random_string = ''.join(choice(ascii_uppercase) for i in range(10))
