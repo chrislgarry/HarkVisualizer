@@ -92,6 +92,12 @@ p#subtitle {
 
 :focus { outline: none; }
 
+div#content {
+    margin-top: 2em;
+}
+span#filetype {
+    margin-left: -150%;
+}
 
 .ribbon {
   border: 1px solid #ff0000;
