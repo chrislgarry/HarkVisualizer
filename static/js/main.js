@@ -78,6 +78,7 @@ connection.onmessage = function(event) {
             chatbox.appendChild(text);
 
             chatbox.appendChild(document.createElement("br"));
+        }
         else {
             // If it's a transcription, 
             text = document.createTextNode(message);
