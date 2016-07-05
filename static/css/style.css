@@ -40,7 +40,12 @@ p#subtitle {
   text-align: center;
 }
 
-#transcripttitle{
+#graphtitle{
+  text-align: center;
+  font-weight: 200;
+}
+
+#transcript{
   font-weight: 200;
 }
 
