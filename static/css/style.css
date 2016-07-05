@@ -12,6 +12,7 @@ body {
 h1#title{
   margin-bottom: 0;
   text-align: left;
+  width: 40%;
 }
 
 p#subtitle {
