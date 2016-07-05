@@ -54,7 +54,7 @@ class HttpRequestHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('index.html')
 
-    @gen.coroutine
+    @tornado.gen.coroutine
     def post(self):
         log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
