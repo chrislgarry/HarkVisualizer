@@ -130,7 +130,7 @@ class Speech:
         log.info('Transcription: %s', transcription)
         return transcription
 
-def async_write(socket, utterances_memo, utterances):
+def async_write_transcription(socket, utterances_memo, utterances):
     for srcID in range(len(utterances_memo)):
         random_string = ''.join(choice(ascii_uppercase) for i in range(10))
         file_name = '{0}{1}_part{2}.flac'.format(STAGING_AREA, random_string, srcID)
@@ -142,7 +142,6 @@ def async_write(socket, utterances_memo, utterances):
         socket.write_message(json.dumps(
           '{0} at ({1}:{2}:{3}):'.format(utterance['guid'], minutes, seconds, milliseconds)))
         self.write_message(json.dumps(transcription, ensure_ascii=False))
-
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
@@ -188,7 +187,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             if sum(results['scene']['numSounds'].values()) == len(utterances_memo):
                 log.info("Writing transcriptions asynchronously")
                 pool = ProcessPoolExecutor(max_workers=1)
-                future = pool.submit(async_write, self, utterances_memo, utterances)
+                future = pool.submit(async_write_transcription, self, utterances_memo, utterances)
                 yield future
                 pool.shutdown()
                 del utterances_memo[:]
