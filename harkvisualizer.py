@@ -47,7 +47,7 @@ class HttpRequestHandler(web.RequestHandler):
 
 
     def get(self):
-       self.render('index.html')
+        self.render('index.html')
 
     def post(self):
         file = self.request.files['file'][0]
