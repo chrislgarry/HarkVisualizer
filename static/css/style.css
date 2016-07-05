@@ -78,6 +78,43 @@ p#subtitle {
 :focus { outline: none; }
 
 
+.ribbon {
+  border: 1px solid #ff0000;
+  overflow: hidden;
+  white-space: nowrap;
+  /* top left corner */
+  position: absolute;
+  right: -50px;
+  top: 40px;
+  /* 45 deg ccw rotation */
+  -webkit-transform: rotate(45deg);
+     -moz-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+       -o-transform: rotate(45deg);
+          transform: rotate(45deg);
+  /* shadow */
+  -webkit-box-shadow: 0 0 20px #888;
+     -moz-box-shadow: 0 0 20px #888;
+          box-shadow: 0 0 20px #888;
+}
+
+.ribbon a {
+  color: #000000;
+  display: block;
+  padding: 10px 50px;
+  text-align: center;
+  text-decoration: none;
+  opacity: 0.7
+}
+
+a:hover {
+  color: red;
+}
+
+span#filetype {
+    font-size: 1em;
+}
+
 /*Position the logo sign*/
 
 .logo-sign {
@@ -163,37 +200,3 @@ p#subtitle {
             transform: scaleY(1);
   }
 }
-
-.ribbon {
-  border: 1px solid #ff0000;
-  overflow: hidden;
-  white-space: nowrap;
-  /* top left corner */
-  position: absolute;
-  right: -50px;
-  top: 40px;
-  /* 45 deg ccw rotation */
-  -webkit-transform: rotate(45deg);
-     -moz-transform: rotate(45deg);
-      -ms-transform: rotate(45deg);
-       -o-transform: rotate(45deg);
-          transform: rotate(45deg);
-  /* shadow */
-  -webkit-box-shadow: 0 0 20px #888;
-     -moz-box-shadow: 0 0 20px #888;
-          box-shadow: 0 0 20px #888;
-}
-
-.ribbon a {
-  color: #000000;
-  display: block;
-  padding: 10px 50px;
-  text-align: center;
-  text-decoration: none;
-  opacity: 0.7
-}
-
-a:hover {
-  color: red;
-}
-

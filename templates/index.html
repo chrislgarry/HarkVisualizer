@@ -3,7 +3,7 @@
 
     <head>
         <div class="ribbon">
-            <a href="#">Documentation</a>
+            <a href="https://github.com/chrislgarry/HarkVisualizer/wiki/Wiki">Documentation</a>
         </div>
     	<title>Hark Visualizer</title>
         <link rel=stylesheet type=text/css href="{{ static_url("css/style.css") }}"></link>
@@ -44,8 +44,8 @@
 	    </header>
 
 	    <div id="call-to-action" class="centered">
-	    	<p><span class="head">Upload an Audio File</span></p>
-	    	<p><span class="head">(flac, wav)</span></p>
+	    	<p><span class="head">Upload 8-Channel Audio</span></p>
+	    	<p><span id="filetype" class="head">(flac, wav)</span></p>
 		    <form action="" method=post enctype=multipart/form-data>
 		    	<input accept="audio/flac, audio/wav" type="file" name="file" id="file" class="inputfile" required/>
 		        <input type=submit value="Upload" id="submit">
