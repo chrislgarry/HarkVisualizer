@@ -74,6 +74,7 @@ connection.onmessage = function(event) {
         chatbox = document.getElementById("chatbox")
         chatbox.appendChild(text);
         chatbox.appendChild(document.createElement("br"))
+        chatbox.appendChild(document.createElement("br"))
     }
 }
 
