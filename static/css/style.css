@@ -29,8 +29,10 @@ p#subtitle {
 
 #chatbox {
   overflow: visible;
-  height: 34.6em;
+  height: 41.4em;
   width:  75%;
+  font-weight: 500;
+  font-size: smaller;
 }
 
 #title{
