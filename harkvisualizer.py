@@ -58,26 +58,27 @@ class HttpRequestHandler(tornado.web.RequestHandler):
     def post(self):
         log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
-        future = pool.submit(self.async_upload)
+        future = pool.submit(async_upload)
         yield future
         pool.shutdown()
         log.info("Rendering visualization page")
         self.render('visualize.html')
 
-    def async_upload(self):
-        file = self.request.files['file'][0]
-        file_name = secure_filename(file['filename'])
-        # Best effort to ensure same file name is unique per post
-        random_string = ''.join(choice(ascii_uppercase) for i in range(10))
-        audio_file = '{0}{1}_{2}'.format(STAGING_AREA, random_string, file_name)
-        write_handle = open(audio_file, 'w')
-        write_handle.write(file['body'])
-        read_handle = open(audio_file, 'rb')
-        # Attempt llogin in the event that hark session logged out
-        hark.client.login()
-        hark.client.createSession(default_hark_config)
-        hark.upload_file(read_handle)
-        log.info("Asynchronous upload complete")
+# To multiprocess this, it cannot be an instance method 
+def async_upload(self):
+    file = self.request.files['file'][0]
+    file_name = secure_filename(file['filename'])
+    # Best effort to ensure same file name is unique per post
+    random_string = ''.join(choice(ascii_uppercase) for i in range(10))
+    audio_file = '{0}{1}_{2}'.format(STAGING_AREA, random_string, file_name)
+    write_handle = open(audio_file, 'w')
+    write_handle.write(file['body'])
+    read_handle = open(audio_file, 'rb')
+    # Attempt llogin in the event that hark session logged out
+    hark.client.login()
+    hark.client.createSession(default_hark_config)
+    hark.upload_file(read_handle)
+    log.info("Asynchronous upload complete")
 
 # Wrapper around some PyHarkSaas methods
 class Hark:
