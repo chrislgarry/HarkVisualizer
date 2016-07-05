@@ -14,14 +14,13 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.gen
-import tornado.httpserver
 
 from werkzeug.utils import secure_filename
 
 STAGING_AREA = '/tmp/'
 STATIC_PATH = 'static'
 HTML_TEMPLATE_PATH = 'templates'
-LISTEN_PORT = 14920
+LISTEN_PORT = 80
 LANGUAGE = 'ja-JP'
 
 log.basicConfig(
@@ -60,7 +59,7 @@ class HttpRequestHandler(tornado.web.RequestHandler):
         file = self.request.files['file'][0]
         hark.client.login()
         hark.client.createSession(default_hark_config)
-        log.info("Uploading asynchrounously")
+        log.info("Uploading asynchronously")
         pool = ProcessPoolExecutor(max_workers=2)
         future = pool.submit(async_upload, file)
         yield future
@@ -131,6 +130,19 @@ class Speech:
         log.info('Transcription: %s', transcription)
         return transcription
 
+def async_write(socket, utterances_memo, utterances):
+    for srcID in range(len(utterances_memo)):
+        random_string = ''.join(choice(ascii_uppercase) for i in range(10))
+        file_name = '{0}{1}_part{2}.flac'.format(STAGING_AREA, random_string, srcID)
+        hark.get_audio(srcID, file_name)
+        transcription = speech.translate(file_name)
+        utterance = utterances[srcID]
+        seconds, milliseconds = divmod(utterance['startTimeMs'], 1000)
+        minutes, seconds = divmod(seconds, 60)
+        socket.write_message(json.dumps(
+          '{0} at ({1}:{2}:{3}):'.format(utterance['guid'], minutes, seconds, milliseconds)))
+        self.write_message(json.dumps(transcription, ensure_ascii=False))
+
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
@@ -152,7 +164,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # ioloop to wait before attempting to sending data 
         tornado.ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
- 
+
+    @tornado.gen.coroutine
     def send_data(self, utterances_memo = []):
         if hark.client.getSessionID():
             results = hark.client.getResults()
@@ -173,17 +186,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if hark.client.isFinished():
             # If we have all the utterances, transcribe, then close the socket
             if sum(results['scene']['numSounds'].values()) == len(utterances_memo):
-                for srcID in range(len(utterances_memo)):
-                    random_string = ''.join(choice(ascii_uppercase) for i in range(10))
-                    file_name = '{0}{1}_part{2}.flac'.format(STAGING_AREA, random_string, srcID)
-                    hark.get_audio(srcID, file_name)
-                    transcription = speech.translate(file_name)
-                    utterance = utterances[srcID]
-                    seconds, milliseconds = divmod(utterance['startTimeMs'], 1000)
-                    minutes, seconds = divmod(seconds, 60)
-                    self.write_message(json.dumps(
-                      '{0} at ({1}:{2}:{3}):'.format(utterance['guid'], minutes, seconds, milliseconds)))
-                    self.write_message(json.dumps(transcription, ensure_ascii=False))
+                log.info("Writing transcriptions asynchronously")
+                pool = ProcessPoolExecutor(max_workers=1)
+                future = pool.submit(async_write, self, utterances_memo, utterances)
+                yield future
+                pool.shutdown()
                 del utterances_memo[:]
                 self.close()
         else:
@@ -217,8 +224,5 @@ if __name__ == '__main__':
     atexit.register(clean_staging)
     log.info('Initializing web application')
     app = get_app()
-    log.info('Initializing http server')
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(80)
-    app.listen(14920)
+    app.listen(LISTEN_PORT)
     tornado.ioloop.IOLoop.instance().start()
