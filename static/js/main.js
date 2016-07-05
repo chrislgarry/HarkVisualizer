@@ -75,6 +75,9 @@ connection.onmessage = function(event) {
     }
     // Message is a chatbox entry
     else{
+        document.getElementById("chart1loader").style.visibility = "hidden";
+        document.getElementById("chart2loader").style.visibility = "hidden";
+
         // If it's a timestamp message, make it bold
         if(message.includes(":")) {
             text = document.createTextNode(message);
