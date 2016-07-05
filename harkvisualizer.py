@@ -20,7 +20,7 @@ from werkzeug.utils import secure_filename
 STAGING_AREA = '/tmp/'
 STATIC_PATH = 'static'
 HTML_TEMPLATE_PATH = 'templates'
-LISTEN_PORT = 80
+LISTEN_PORT = 14920
 LANGUAGE = 'ja-JP'
 
 log.basicConfig(
@@ -216,5 +216,8 @@ if __name__ == '__main__':
     atexit.register(clean_staging)
     log.info('Initializing web application')
     app = get_app()
-    app.listen(LISTEN_PORT)
+    log.info('Initializing http server')
+    http_server = httpserver.HTTPServer(app)
+    http_server.listen(80)
+    app.listen(14920)
     tornado.ioloop.IOLoop.instance().start()
