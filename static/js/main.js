@@ -10,6 +10,12 @@ var xfilter = crossfilter(),
     durationPerName = guidDim.group().reduceSum(function(d) {return +d.duration;});
 
 function render_plots() {
+    // Render the dashboards just before plots are rendered
+    document.getElementsById("processing_loader")[0].style.visibility = "invisible";
+    document.getElementsByClassName("left_dashboard")[0].style.visibility = "visible";
+    document.getElementsByClassName("right_dashboard")[0].style.visibility = "visible";
+
+    // Initialize and render plots
     durationRingChart
         .width(250).height(250)
         .dimension(azimuthDim)
@@ -98,6 +104,4 @@ connection.onmessage = function(event) {
 // On close, notify the user process complete
 connection.onclose = function(event) {
     rendered = false;
-    // Processing is complete. Hide the loading text
-    document.getElementById("content").style.visibility = 'invisible';
 }
