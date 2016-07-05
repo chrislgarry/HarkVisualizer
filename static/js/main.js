@@ -74,9 +74,3 @@ connection.onmessage = function(event) {
 connection.onclose = function(event) {
     alert("Processing complete.");
 }
-
-// Auto-scroll the chatbox for new transcriptions
-window.setInterval(function() {
-  var elem = document.getElementById("chatbox");
-  elem.scrollTop = elem.scrollHeight;
-}, 1000);
