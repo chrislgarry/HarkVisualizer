@@ -58,7 +58,7 @@ class HttpRequestHandler(tornado.web.RequestHandler):
     def post(self):
         log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
-        future = pool.submit(async_upload)
+        future = pool.submit(self.async_upload)
         yield future
         pool.shutdown()
         log.info("Rendering visualization page")
