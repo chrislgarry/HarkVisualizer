@@ -26,9 +26,3 @@ Used for n-dimensional filtering of multivariate datasets across D3 charts.
 
 ###[c3.js](http://c3js.org/)
 A wrapper around D3.js for building charts quickly.
-
-## Specifications
-### Internal Specifications
-####Placeholder
-### External Specifications
-####Placeholder
