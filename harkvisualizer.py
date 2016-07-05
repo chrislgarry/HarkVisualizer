@@ -10,7 +10,7 @@ from concurrent.futures import ProcessPoolExecutor
 import pyhark.saas
 import speech_recognition
 
-import tornado
+from tornado import web, websocket, ioloop
 from werkzeug.utils import secure_filename
 
 STAGING_AREA = '/tmp/'
