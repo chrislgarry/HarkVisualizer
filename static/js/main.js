@@ -75,6 +75,8 @@ connection.onmessage = function(event) {
     }
     // Message is a chatbox entry
     else{
+        document.getElementById("chart1loader").style.visibility = "hidden";
+        document.getElementById("chart2loader").style.visibility = "hidden";
 
         // If it's a timestamp message, make it bold
         if(message.includes(":")) {
@@ -104,6 +106,6 @@ connection.onmessage = function(event) {
 
 // On close, notify the user process complete
 connection.onclose = function(event) {
-    document.getElementById("layer_1").style.visibility = "hidden";
+    document.getElementById("transcriptloader").style.visibility = "hidden";
     rendered = false;
 }
