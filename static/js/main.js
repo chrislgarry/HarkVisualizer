@@ -43,6 +43,7 @@ document.getElementById("chatbox").style.overflow = "scroll";
 // Connect to the remote websocket server
 var connection = new WebSocket("ws://harkvisualizer.com/websocket");
 
+var rendered = false;
 // When a socket message is received
 connection.onmessage = function(event) {
     var message = JSON.parse(event.data);
@@ -58,18 +59,26 @@ connection.onmessage = function(event) {
             "duration": duration
         }]
         xfilter.add(updateObject);
-        render_plots();
-        dc.redrawAll();
+        if(rendered){
+            dc.redrawAll()
+        }
+        else{
+            render_plots();
+            rendered = true;
+        }
     }
     // Message is a transcription 
     else{
         // Render transcription in chat box
         text = document.createTextNode(message + "\n")
-        document.getElementById("chatbox").appendChild(text);
+        chatbox = document.getElementById("chatbox")
+        chatbox.appendChild(text);
+        chatbox.appendChild(document.createElement("br"))
     }
 }
 
 // On close, notify the user process complete
 connection.onclose = function(event) {
-    alert("Processing complete.");
+    rendered = false;
+    // Processing is complete. Hide the loading text
 }

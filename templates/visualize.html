@@ -46,6 +46,13 @@
                 <div id="chatbox"></div>
             </div>
         </div>
+        <script>
+            document.getElementById('submit').onclick = function() {
+               if (document.getElementById('file').value) {
+                 document.getElementsByClassName('loader')[0].style.visibility = 'visible';
+               }
+            }
+        </script>
         <script type="text/javascript" src="{{ static_url("js/d3.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/crossfilter.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/dc.js") }}"></script>
