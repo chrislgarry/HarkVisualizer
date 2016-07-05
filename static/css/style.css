@@ -170,7 +170,7 @@ p#subtitle {
   white-space: nowrap;
   /* top left corner */
   position: absolute;
-  left: -50px;
+  right: -50px;
   top: 40px;
   /* 45 deg ccw rotation */
   -webkit-transform: rotate(45deg);
