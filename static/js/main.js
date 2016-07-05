@@ -17,14 +17,17 @@ function render_plots(){
         .innerRadius(50)
         .colors(d3.scale.category10())
         .label(function(d) { return d.key + "\xB0"; })
-        .text("Utterances per Azimuth");
+        .emptyTitle("Loading results...")
+        .externalLabels(5)
+        .drawPaths(true)
+        .externalRadiusPadding(2)
     speakersRowChart
         .width(400).height(250)
         .dimension(guidDim)
         .group(durationPerName)
         .elasticX(true)
         .colors(d3.scale.category10())
-        .text("Time Spoken per Speaker");
+        .text("Time Spoken in Seconds");
     dc.renderAll();
 }
 
