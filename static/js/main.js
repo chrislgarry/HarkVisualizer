@@ -74,8 +74,9 @@ connection.onmessage = function(event) {
             text = document.createTextNode(message);
             chatbox = document.getElementById("chatbox");
             
-            chatbox.appendChild(document.createElement("b"));
-            chatbox.appendChild(text);
+            bold = document.createElement("b")
+            bold.appendChild(text);
+            chatbox.appendChild(bold);
 
             chatbox.appendChild(document.createElement("br"));
         }
@@ -98,5 +99,5 @@ connection.onmessage = function(event) {
 connection.onclose = function(event) {
     rendered = false;
     // Processing is complete. Hide the loading text
-    document.getElementsByClassName("content")[0].style.visibility = 'visible';
+    document.getElementById("content").style.visibility = 'invisible';
 }
