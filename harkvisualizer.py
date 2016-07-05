@@ -218,7 +218,7 @@ if __name__ == '__main__':
     log.info('Initializing web application')
     app = get_app()
     log.info('Initializing http server')
-    http_server = httpserver.HTTPServer(app)
+    http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(80)
     app.listen(14920)
     tornado.ioloop.IOLoop.instance().start()
