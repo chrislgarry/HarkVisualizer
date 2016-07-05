@@ -131,7 +131,7 @@ class Speech:
         return transcription
 
 
-class WebSocketHandler(tornado.websocket.SocketHandler):
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
 
     # Allow cross-origin web socket connections
