@@ -146,6 +146,14 @@ a:hover {
     font-size: 1em;
 }
 
+svg#chart1loader {
+    margin-bottom: -1em;
+}
+
+svg#chart2loader {
+    margin-bottom: -1em;
+}
+
 /*Position the logo sign*/
 
 .logo-sign {
