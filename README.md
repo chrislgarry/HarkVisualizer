@@ -1,6 +1,8 @@
 ## Hark Visualizer
 A web app written with the Tornado framework for visualizing audio. The web app processes 8-channel flac and wav files to detect direction of sound, duration of sounds, and a transcription using speech recognition. 
 
+[Read more](https://github.com/chrislgarry/HarkVisualizer/wiki/Documentation)
+
 ## Thirdy-Party Services
 
 ###[Amazon AWS](http://aws.amazon.com/)
