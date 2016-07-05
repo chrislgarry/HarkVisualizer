@@ -13,7 +13,7 @@ import speech_recognition
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
-import web.asynchronous
+import tornado.gen
 
 from werkzeug.utils import secure_filename
 
@@ -50,7 +50,7 @@ default_hark_config = {
 
 class HttpRequestHandler(tornado.web.RequestHandler):
 
-    @asynchronous
+    @web.asynchronous
     def get(self):
         self.render('index.html')
 
