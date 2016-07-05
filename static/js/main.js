@@ -47,7 +47,7 @@ function resetData() {
 document.getElementById("chatbox").style.overflow = "scroll";
 
 // Connect to the remote websocket server
-var connection = new WebSocket("ws://harkvisualizer.com:14920/websocket");
+var connection = new WebSocket("ws://harkvisualizer.com/websocket");
 
 var rendered = false;
 // When a socket message is received
