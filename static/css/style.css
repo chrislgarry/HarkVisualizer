@@ -41,6 +41,10 @@ p#subtitle {
   font-weight: 200;
 }
 
+#transcripttitle{
+  font-weight: 200;
+}
+
 .left_dashboard {
   float: left;
   display:  flex;
