@@ -100,6 +100,11 @@ span#processing {
     font-size: 1em;
 }
 
+#processing {
+    margin-left: -150%;
+    font-size: 1em;
+}
+
 .ribbon {
   border: 1px solid #ff0000;
   overflow: hidden;
