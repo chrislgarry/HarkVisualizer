@@ -11,7 +11,7 @@ var xfilter = crossfilter(),
 
 function render_plots() {
     // Render the dashboards just before plots are rendered
-    document.getElementById("processing_loader")[0].style.visibility = "invisible";
+    document.getElementById("processing_loader").style.visibility = "invisible";
     document.getElementsByClassName("left_dashboard")[0].style.visibility = "visible";
     document.getElementsByClassName("right_dashboard")[0].style.visibility = "visible";
 
