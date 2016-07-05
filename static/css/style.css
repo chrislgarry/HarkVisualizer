@@ -9,6 +9,15 @@ body {
   font-weight: 200;
 }
 
+h1#title{
+  margin-bottom: 0;
+}
+
+p#subtitle {
+    font-size: 1.em;
+    margin: 0 0 0 4.15em;
+}
+
 .centered {
   position: fixed;
   top: 50%;

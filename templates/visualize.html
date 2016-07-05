@@ -10,7 +10,7 @@
 
     <body>
         <div class="header">
-            <h1>
+            <h1 id="title">
                 <svg class="logo-sign" xmlns="http://www.w3.org/2000/svg" width="54" height="30" viewBox="-55 25 60 30" fill="#FF0000">
                     <g class="logo-sign__box">
                         <polygon class="logo-sign__line" points="-1,37.333 -1,42.667 -3,44 -3,36"/>
@@ -33,6 +33,9 @@
                 </svg>
                 Hark Visualizer
             </h1>
+            <p id="subtitle">
+                A multi-channel audio analyzer
+            </p>
         </div>
         <div id="content">
             <div class="left_dashboard">
@@ -46,13 +49,6 @@
                 <div id="chatbox"></div>
             </div>
         </div>
-        <script>
-            // document.getElementById('submit').onclick = function() {
-            //    if (document.getElementById('file').value) {
-            //      document.getElementsByClassName("loader")[0].style.visibility = 'visible';
-            //    }
-            // }
-        </script>
         <script type="text/javascript" src="{{ static_url("js/d3.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/crossfilter.js") }}"></script>
         <script type="text/javascript" src="{{ static_url("js/dc.js") }}"></script>

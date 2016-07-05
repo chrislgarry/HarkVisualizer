@@ -70,7 +70,7 @@ connection.onmessage = function(event) {
     // Message is a chatbox entry
     else{
         // If it's a timestamp message, make it bold
-        if(message.includes("(")) {
+        if(message.includes(":")) {
             text = document.createTextNode(message);
             chatbox = document.getElementById("chatbox");
             
