@@ -165,6 +165,7 @@ p#subtitle {
 }
 
 .ribbon {
+  border: 1px solid #ff0000;
   overflow: hidden;
   white-space: nowrap;
   /* top left corner */
@@ -178,9 +179,9 @@ p#subtitle {
        -o-transform: rotate(45deg);
           transform: rotate(45deg);
   /* shadow */
-  -webkit-box-shadow: 0 0 10px #888;
-     -moz-box-shadow: 0 0 10px #888;
-          box-shadow: 0 0 10px #888;
+  -webkit-box-shadow: 0 0 20px #888;
+     -moz-box-shadow: 0 0 20px #888;
+          box-shadow: 0 0 20px #888;
 }
 
 .ribbon a {
@@ -189,7 +190,7 @@ p#subtitle {
   padding: 10px 50px;
   text-align: center;
   text-decoration: none;
-  opacity: 0.3
+  opacity: 0.7
 }
 
 a:hover {
