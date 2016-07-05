@@ -75,6 +75,8 @@ connection.onmessage = function(event) {
         chatbox.appendChild(text);
         chatbox.appendChild(document.createElement("br"))
         chatbox.appendChild(document.createElement("br"))
+        // Auto-scroll when a new message is printed
+        chatbox.scrollTop = elem.scrollHeight;
     }
 }
 
