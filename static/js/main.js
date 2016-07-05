@@ -66,7 +66,8 @@ connection.onmessage = function(event) {
     // Message is a transcription 
     else{
         // Render transcription in chat box
-        document.getElementById("chatbox").innerHTML += "<p id=\"message\">" + message + "</p>";
+        text = document.createTextNode(message)
+        document.getElementById("chatbox").appendChild(text);
     }
 }
 
