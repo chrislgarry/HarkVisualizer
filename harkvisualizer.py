@@ -10,7 +10,7 @@ import pyhark.saas
 import speech_recognition
 
 from concurrent.futures import ProcessPoolExecutor
-from tornado import asynchronous, gen, ioloop, web, websocket
+from tornado import web.asynchronous, gen, ioloop, web, websocket
 from werkzeug.utils import secure_filename
 
 STAGING_AREA = '/tmp/'
@@ -50,7 +50,7 @@ class HttpRequestHandler(web.RequestHandler):
     def get(self):
         self.render('index.html')
 
-    @asynchronous
+    @gen.coroutine
     def post(self):
         log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
@@ -60,7 +60,6 @@ class HttpRequestHandler(web.RequestHandler):
         log.info("Rendering visualization page")
         self.render('visualize.html')
 
-    @gen.coroutine
     def async_upload(self):
         file = self.request.files['file'][0]
         file_name = secure_filename(file['filename'])
@@ -148,7 +147,7 @@ class WebSocketHandler(websocket.WebSocketHandler):
         # ioloop to wait before attempting to sending data 
         ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
-    @asynchronous
+
     def send_data(self, utterances_memo = []):
         if hark.client.getSessionID():
             results = hark.client.getResults()
