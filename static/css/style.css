@@ -2,6 +2,7 @@
 
 body {
   font-family: 'Open Sans', sans-serif;
+  overflow: hidden;
 }
 
 a {
@@ -131,9 +132,9 @@ span#processing {
        -o-transform: rotate(45deg);
           transform: rotate(45deg);
   /* shadow */
-  -webkit-box-shadow: 0 0 20px #888;
-     -moz-box-shadow: 0 0 20px #888;
-          box-shadow: 0 0 20px #888;
+  -webkit-box-shadow: 0 0 10px #888;
+     -moz-box-shadow: 0 0 10px #888;
+          box-shadow: 0 0 10px #888;
 }
 
 .ribbon a {
