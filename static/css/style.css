@@ -95,8 +95,9 @@ p#subtitle {
 div#content {
     margin-top: 2em;
 }
-span#filetype {
+span#processing {
     margin-left: -150%;
+    font-size: 1em;
 }
 
 .ribbon {
