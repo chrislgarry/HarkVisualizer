@@ -170,7 +170,7 @@ p#subtitle {
   white-space: nowrap;
   /* top left corner */
   position: absolute;
-  right: -50px;
+  left: -50px;
   top: 40px;
   /* 45 deg ccw rotation */
   -webkit-transform: rotate(45deg);
@@ -185,16 +185,15 @@ p#subtitle {
 }
 
 .ribbon a {
-  border: 1px solid #faa;
-  color: #fff;
+  border: 1px solid #ff0000;
+  color: #ff0000;
   display: block;
   font: bold 81.25% 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  margin: 1px 0;
   padding: 10px 50px;
   text-align: center;
   text-decoration: none;
-  /* shadow */
-  text-shadow: 0 0 5px #444;
+  text-shadow: -1px -1px 1px #fff, 1px 1px 1px #000;
+  opacity: 0.3
 }
 
 
