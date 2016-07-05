@@ -32,7 +32,6 @@ p#subtitle {
   /*! margin-left: 50%; */
   /*! margin-top: 15em; */
   height: 30em;
-  border-style: dotted;
   width:  75%;
 }
 
@@ -76,6 +75,12 @@ p#subtitle {
   display: inline-block;
   vertical-align: top;
   visibility: hidden;
+}
+
+svg#layer_1 {
+    position: absolute;
+    margin-left: 5em;
+    margin-top: -2.3em;
 }
 
 #processing_loader {
