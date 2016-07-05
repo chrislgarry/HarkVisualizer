@@ -17,14 +17,12 @@ function render_plots(){
         .innerRadius(50)
         .colors(d3.scale.category10())
         .label(function(d) { return d.key + "\xB0"; })
-        .emptyTitle("Loading results...")
-        .drawPaths(true)
     speakersRowChart
         .width(400).height(250)
         .dimension(guidDim)
         .group(durationPerName)
         .elasticX(true)
-        .colors(d3.scale.category10());
+        .colors(d3.scale.category10())
     dc.renderAll();
 }
 
