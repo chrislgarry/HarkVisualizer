@@ -152,7 +152,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # ioloop to wait before attempting to sending data 
         tornado.ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
-
+    @tornado.gen.coroutine
     def send_data(self, utterances_memo = []):
         if hark.client.getSessionID():
             results = hark.client.getResults()
