@@ -103,5 +103,6 @@ connection.onmessage = function(event) {
 
 // On close, notify the user process complete
 connection.onclose = function(event) {
+    document.getElementById("transcripttitle").style.visibility = "invisible";
     rendered = false;
 }
