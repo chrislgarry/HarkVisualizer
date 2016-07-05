@@ -29,8 +29,6 @@ p#subtitle {
 
 #chatbox {
   overflow: visible;
-  /*! margin-left: 50%; */
-  /*! margin-top: 15em; */
   height: 34.6em;
   width:  75%;
 }
@@ -83,6 +81,7 @@ svg#transcriptloader {
 }
 
 #processing_loader {
+  padding: 3px;
   visibility: visible;
 }
 
@@ -91,7 +90,7 @@ svg#transcriptloader {
 }
 
 #chart-ring-duration{
-  margin-left: 33%;
+  margin-left: 31%;
 }
 
 :focus { outline: none; }
