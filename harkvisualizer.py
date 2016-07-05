@@ -1,9 +1,9 @@
 import atexit
 from datetime import timedelta
-import simplejson as json
 import logging as log
 import os
 from random import choice
+import simplejson as json
 from string import ascii_uppercase
 
 import pyhark.saas
