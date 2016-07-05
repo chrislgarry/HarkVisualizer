@@ -30,8 +30,6 @@ function render_plots(){
     dc.renderAll();
 }
 
-render_plots();
-
 // Resets the graphs
 function resetData() {
     var durationChartFilters = durationRingChart.filters();
@@ -64,6 +62,7 @@ connection.onmessage = function(event) {
             "duration": duration
         }]
         xfilter.add(updateObject);
+        render_plots();
         dc.redrawAll();
     }
     // Message is a transcription 
