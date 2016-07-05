@@ -14,6 +14,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.gen
+import tornado.httpserver
 
 from werkzeug.utils import secure_filename
 
