@@ -165,7 +165,6 @@ p#subtitle {
 }
 
 .ribbon {
-  background-color: #a00;
   overflow: hidden;
   white-space: nowrap;
   /* top left corner */
@@ -185,10 +184,8 @@ p#subtitle {
 }
 
 .ribbon a {
-  border: 1px solid #ff0000;
   color: #000000;
   display: block;
-  font: bold 81.25% 'Helvetica Neue', Helvetica, Arial, sans-serif;
   padding: 10px 50px;
   text-align: center;
   text-decoration: none;
