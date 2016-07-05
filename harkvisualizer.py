@@ -50,7 +50,7 @@ default_hark_config = {
 
 class HttpRequestHandler(tornado.web.RequestHandler):
 
-    @web.asynchronous
+    @tornado.web.asynchronous
     def get(self):
         self.render('index.html')
 
