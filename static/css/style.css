@@ -192,4 +192,7 @@ p#subtitle {
   opacity: 0.3
 }
 
+a:hover {
+  color: red;
+}
 
