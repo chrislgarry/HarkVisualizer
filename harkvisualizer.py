@@ -5,12 +5,12 @@ import os
 from random import choice
 import simplejson as json
 from string import ascii_uppercase
+from concurrent.futures import ProcessPoolExecutor
 
 import pyhark.saas
 import speech_recognition
 
-from concurrent.futures import ProcessPoolExecutor
-from tornado import web.asynchronous, gen, ioloop, web, websocket
+import tornado
 from werkzeug.utils import secure_filename
 
 STAGING_AREA = '/tmp/'
@@ -44,7 +44,7 @@ default_hark_config = {
 }
 
 
-class HttpRequestHandler(web.RequestHandler):
+class HttpRequestHandler(tornado.web.RequestHandler):
 
     @asynchronous
     def get(self):
@@ -127,7 +127,7 @@ class Speech:
         return transcription
 
 
-class WebSocketHandler(websocket.WebSocketHandler):
+class WebSocketHandler(tornado.websocket.web.SocketHandler):
 
 
     # Allow cross-origin web socket connections
@@ -145,7 +145,7 @@ class WebSocketHandler(websocket.WebSocketHandler):
         # Do not hold packets for bandwidth optimization
         self.set_nodelay(True)
         # ioloop to wait before attempting to sending data 
-        ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
+        tornado.ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
 
     def send_data(self, utterances_memo = []):
@@ -182,7 +182,7 @@ class WebSocketHandler(websocket.WebSocketHandler):
                 del utterances_memo[:]
                 self.close()
         else:
-            ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1), self.send_data)
+            tornado.ioloop.IOLoop.instance().add_timeout(timedelta(seconds=1), self.send_data)
 
 
 def clean_staging():
@@ -191,10 +191,10 @@ def clean_staging():
        hark.delete_session()
 
 def get_app():
-    application = web.Application([
+    application = tornado.web.Application([
         (r'/', HttpRequestHandler),
         (r'/websocket', WebSocketHandler),
-        (r'/favicon.ico', web.StaticFileHandler,
+        (r'/favicon.ico', tornado.web.StaticFileHandler,
             dict(path=settings['static_path'])),
         ], **settings)
     return application
@@ -213,4 +213,4 @@ if __name__ == '__main__':
     log.info('Initializing web application')
     app = get_app()
     app.listen(LISTEN_PORT)
-    ioloop.IOLoop.instance().start()
+    tornado.ioloop.IOLoop.instance().start()
