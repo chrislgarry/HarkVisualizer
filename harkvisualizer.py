@@ -59,7 +59,7 @@ class HttpRequestHandler(tornado.web.RequestHandler):
         file = self.request.files['file'][0]
         hark.client.login()
         hark.client.createSession(default_hark_config)
-        log.info("Uploading asynchronously")
+        log.info("Uploading asynchrounously")
         pool = ProcessPoolExecutor(max_workers=2)
         future = pool.submit(async_upload, file)
         yield future
@@ -130,18 +130,6 @@ class Speech:
         log.info('Transcription: %s', transcription)
         return transcription
 
-def async_write_transcription(socket, utterances_memo, utterances):
-    for srcID in range(len(utterances_memo)):
-        random_string = ''.join(choice(ascii_uppercase) for i in range(10))
-        file_name = '{0}{1}_part{2}.flac'.format(STAGING_AREA, random_string, srcID)
-        hark.get_audio(srcID, file_name)
-        transcription = speech.translate(file_name)
-        utterance = utterances[srcID]
-        seconds, milliseconds = divmod(utterance['startTimeMs'], 1000)
-        minutes, seconds = divmod(seconds, 60)
-        socket.write_message(json.dumps(
-          '{0} at ({1}:{2}:{3}):'.format(utterance['guid'], minutes, seconds, milliseconds)))
-        self.write_message(json.dumps(transcription, ensure_ascii=False))
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
@@ -163,8 +151,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # ioloop to wait before attempting to sending data 
         tornado.ioloop.IOLoop.instance().add_timeout(timedelta(seconds=0),
                                              self.send_data)
-
-    @tornado.gen.coroutine
+ 
     def send_data(self, utterances_memo = []):
         if hark.client.getSessionID():
             results = hark.client.getResults()
@@ -185,11 +172,17 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if hark.client.isFinished():
             # If we have all the utterances, transcribe, then close the socket
             if sum(results['scene']['numSounds'].values()) == len(utterances_memo):
-                log.info("Writing transcriptions asynchronously")
-                pool = ProcessPoolExecutor(max_workers=1)
-                future = pool.submit(async_write_transcription, self, utterances_memo, utterances)
-                yield future
-                pool.shutdown()
+                for srcID in range(len(utterances_memo)):
+                    random_string = ''.join(choice(ascii_uppercase) for i in range(10))
+                    file_name = '{0}{1}_part{2}.flac'.format(STAGING_AREA, random_string, srcID)
+                    hark.get_audio(srcID, file_name)
+                    transcription = speech.translate(file_name)
+                    utterance = utterances[srcID]
+                    seconds, milliseconds = divmod(utterance['startTimeMs'], 1000)
+                    minutes, seconds = divmod(seconds, 60)
+                    self.write_message(json.dumps(
+                      '{0} at ({1}:{2}:{3}):'.format(utterance['guid'], minutes, seconds, milliseconds)))
+                    self.write_message(json.dumps(transcription, ensure_ascii=False))
                 del utterances_memo[:]
                 self.close()
         else:
