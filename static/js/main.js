@@ -26,8 +26,7 @@ function render_plots(){
         .dimension(guidDim)
         .group(durationPerName)
         .elasticX(true)
-        .colors(d3.scale.category10())
-        .text("Time Spoken in Seconds");
+        .colors(d3.scale.category10());
     dc.renderAll();
 }
 
