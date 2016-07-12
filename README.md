@@ -1,5 +1,5 @@
 ## Hark Visualizer
-A web app written with the Tornado framework for visualizing audio. The web app only processes 8-channel flac and wav files (for the time being) to detect direction of sound, duration of sounds, and a transcription using speech recognition. 
+A web app written with the Tornado framework for visualizing audio. The web app only processes 8-channel flac and wav files (for the time being) to detect direction of sound, duration of sounds, and a transcription using speech recognition. Try it out using the test.wav file. It **only supports Japanese at the moment**.
 
 [Read more](https://github.com/chrislgarry/HarkVisualizer/wiki)
 
